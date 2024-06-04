@@ -26,6 +26,18 @@ func newTemplate() *Templates {
 	}
 }
 
+func generateCode(c echo.Context) error {
+	text := c.FormValue("text")
+	code, err := qrcode.Encode(text, qrcode.Medium, 256)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to generate image")
+	}
+	qrCodeBase64 := base64.StdEncoding.EncodeToString(code)
+	imgTag := fmt.Sprintf(`<img src="data:image/png;base64,%s" alt="QR Code">`, qrCodeBase64)
+
+	return c.HTML(http.StatusOK, imgTag)
+}
+
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -34,16 +46,7 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(200, "index", nil)
 	})
-	e.POST("/generate", func(c echo.Context) error {
-		text := c.FormValue("text")
-		code, err := qrcode.Encode(text, qrcode.Medium, 256)
-		if err != nil {
-			return c.String(http.StatusInternalServerError, "Failed to generate image")
-		}
-		qrCodeBase64 := base64.StdEncoding.EncodeToString(code)
-		imgTag := fmt.Sprintf(`<img src="data:image/png;base64,%s" alt="QR Code">`, qrCodeBase64)
-		return c.HTML(http.StatusOK, imgTag)
-	})
+	e.POST("/generate", generateCode)
 
 	e.Logger.Fatal(e.Start(":5001"))
 }
