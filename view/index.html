@@ -1,0 +1,30 @@
+{{ block "index" . }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code Generator</title>
+    <script src="https://unpkg.com/htmx.org/dist/htmx.js"></script>
+</head>
+<body>
+    <h1>QR Code Generator</h1>
+    {{ template "form" . }}
+    {{ template "display" . }}
+</body>
+</html>
+{{ end }}
+
+
+{{ block "form" . }}
+    <form hx-swap="outerHTML" hx-target="#generate" hx-post="/generate">
+        <label for="text">Text to encode:</label>
+        <input type="text" id="text" name="text">
+        <button type="submit">Generate</button>
+    </form>
+{{ end }}
+
+{{ block "display" . }}
+<div id="generate">
+
+</div>
+{{ end }}
